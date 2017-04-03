@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>位置变换通知</title>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<style type="text/css">
+		#container{
+			display: table;
+			margin:50px auto;
+		}
+		h1{
+			text-align: center;
+		}
+		.row{
+			display: table-row;
+			line-height: 25px;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<h1 class="row">位置历史记录</h1>
+		<br />
+		<ul  id="ulContainer"  class="row">
+			
+		</ul>
+	</div>
+
+	<script type="text/javascript">
+		var socket = io('http://localhost:3333');
+		socket.on('start data', function (data) {
+		  // console.log(data);
+		  if(data.length===0){
+		  	alert('暂无历史地理数据')
+		  }else{
+		  	generateList(data)
+		  }
+		  // socket.emit('my other event', { my: 'data' });
+		});
+		socket.on('change location',function(data){
+			alert('位置发生改变')
+			var li = generateLi(data)
+			var ulContainer = document.getElementById('ulContainer')
+			ulContainer.insertBefore(li,ulContainer.firstChild)
+		})
+		function generateList(arr){
+			var fragment = document.createDocumentFragment('')
+			arr.forEach(function(obj){
+				var li = generateLi(obj)
+				fragment.appendChild(li)
+			})
+			var ulContainer = document.getElementById('ulContainer')
+			ulContainer.replaceChild(fragment,ulContainer.firstChild)
+		}
+		function generateLi(obj){
+			var time = obj.time; //进行toLocaleString转换后的
+			var location = obj.location;
+			var li = document.createElement('li')
+			li.setAttribute('class','row')
+			var timeNode = document.createElement('time')
+			var strongNode = document.createElement('strong')
+			var timeText = document.createTextNode(time)
+			var locationText = document.createTextNode(location)
+			var middleText = document.createTextNode(' 设备位置为： ')
+			timeNode.appendChild(timeText)
+			strongNode.appendChild(locationText)
+			li.appendChild(timeNode)
+			li.appendChild(middleText)
+			li.appendChild(strongNode)
+			return li;
+		}
+		function domAlert(str){
+
+		}
+		// var data = [{time:((new Date()).toLocaleString()),location:'111:222'},{time:(new Date()).toLocaleString(),location:'111:222'}]
+		// generateList(data)
+	</script>
+</body>
+</html>
