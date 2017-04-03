@@ -28,16 +28,17 @@ function handler(req, res) {
 		res.end('success set data')
 		return;
 	}
+	fs.createReadStream(__dirname + '/index.html').pipe(res)
 
-	fs.readFile(__dirname + '/index.html',function(err, data) {
-			if (err) {
-				res.writeHead(500);
-				return res.end('Error loading index.html');
-			}
+	// fs.readFile(__dirname + '/index.html',function(err, data) {
+	// 		if (err) {
+	// 			res.writeHead(500);
+	// 			return res.end('Error loading index.html');
+	// 		}
 
-			res.writeHead(200);
-			res.end(data);
-	});
+	// 		res.writeHead(200);
+	// 		res.end(data);
+	// });
 }
 
 io.on('connection', function(socket) {
