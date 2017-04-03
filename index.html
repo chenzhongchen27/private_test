@@ -28,7 +28,7 @@
 	</div>
 
 	<script type="text/javascript">
-		var socket = io('http://localhost:3333');
+		var socket = io(location.href.slice(0,location.href.indexOf(':3333')+5));
 		socket.on('start data', function (data) {
 		  // console.log(data);
 		  if(data.length===0){
