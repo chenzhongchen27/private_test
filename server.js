@@ -13,6 +13,7 @@ function handler(req, res) {
 	var urlObj = url.parse(req.url,true)
 	var pathname = urlObj.pathname;
 	//   /set?location=111222
+	console.log('接受请求',req.url)
 	if(pathname==='/set'){
 		var locationObj = {
 			time:((new Date()).toLocaleString()),
