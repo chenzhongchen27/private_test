@@ -2,7 +2,7 @@ var app = require('http').createServer(handler)
 var io = require('socket.io')(app);
 var fs = require('fs');
 var url = require('url');
-var PORT = 3333;
+var PORT = 8084;
 
 app.listen(PORT,'0.0.0.0',function(){
 	console.log(`Server start on port ${PORT}`)
@@ -13,7 +13,7 @@ function handler(req, res) {
 	var urlObj = url.parse(req.url,true)
 	var pathname = urlObj.pathname;
 	//   /set?location=111222
-	console.log('接受请求',req.url)
+//	console.log('接受请求',req.url)
 	if(pathname==='/set'){
 		var locationObj = {
 			time:((new Date()).toLocaleString()),
