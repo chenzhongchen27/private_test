@@ -10,27 +10,15 @@ app.listen(PORT,'0.0.0.0',function(){
 var locationObjHistory = []
 
 function handler(req, res) {
-	// var urlObj = url.parse(req.url,true)
-	// var pathname = urlObj.pathname;
-	//   /set?location=111222
-	// console.log('url--',req.url,'method--',req.method,'headers--',req.headers)
-	// let content='';
-	// req.on('data',function(chunk){
-	// 	content += chunk;
-	// })
-	// req.on('end',function(){
-	// 	locationData=content;
-	// 	console.log('content--',content)
-	// 	res.writeHead(200)
-	// 	res.end('debugger haha')
-	// })
-	// return;
 	if(req.method==='POST'){
 		let content='';
 		req.on('data',function(chunk){
 			content += chunk;
 		})
 		req.on('end',function(){
+			//数据进行处理
+			
+			//end
 			var locationObj = {
 				time:((new Date()).toLocaleString()),
 				location:content
