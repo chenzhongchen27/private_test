@@ -13,19 +13,17 @@ function handler(req, res) {
 	var urlObj = url.parse(req.url,true)
 	var pathname = urlObj.pathname;
 	//   /set?location=111222
-	console.log('url--',req.url,'method--',req.method,'headers--'.req.headers)
+	console.log('url--',req.url,'method--',req.method,'headers--',req.headers)
 	let content='';
 	req.on('data',function(chunk){
 		content += chunk;
 	})
 	req.on('end',function(){
 		locationData=content;
+		console.log('content--',content)
 		res.writeHead(200)
-		res.end('success')
+		res.end('debugger haha')
 	})
-	console.log('content--',content)
-	res.writeHead(200)
-	res.end('debugger haha')
 	return;
 	if(pathname==='/set'){
 		var locationObj = {
