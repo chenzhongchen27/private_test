@@ -1,0 +1,1 @@
+document.write('用document进行write')

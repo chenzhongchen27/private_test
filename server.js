@@ -13,7 +13,20 @@ function handler(req, res) {
 	var urlObj = url.parse(req.url,true)
 	var pathname = urlObj.pathname;
 	//   /set?location=111222
-	console.log('接受请求',req.url)
+	console.log('url--',req.url,'method--',req.method,'headers--'.req.headers)
+	let content='';
+	req.on('data',function(chunk){
+		content += chunk;
+	})
+	req.on('end',function(){
+		locationData=content;
+		res.writeHead(200)
+		res.end('success')
+	})
+	console.log('content--',content)
+	res.writeHead(200)
+	res.end('debugger haha')
+	return;
 	if(pathname==='/set'){
 		var locationObj = {
 			time:((new Date()).toLocaleString()),
@@ -29,17 +42,7 @@ function handler(req, res) {
 		res.end('success set data')
 		return;
 	}
-	fs.createReadStream(__dirname + '/index.html').pipe(res)
-
-	// fs.readFile(__dirname + '/index.html',function(err, data) {
-	// 		if (err) {
-	// 			res.writeHead(500);
-	// 			return res.end('Error loading index.html');
-	// 		}
-
-	// 		res.writeHead(200);
-	// 		res.end(data);
-	// });
+	fs.createReadStream('./index.html').pipe(res)
 }
 
 io.on('connection', function(socket) {
