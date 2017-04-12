@@ -2,7 +2,7 @@ var app = require('http').createServer(handler)
 var io = require('socket.io')(app);
 var fs = require('fs');
 var url = require('url');
-var PORT = 3333;
+var PORT = 8084;
 
 app.listen(PORT,'0.0.0.0',function(){
 	console.log(`Server start on port ${PORT}`)

@@ -28,7 +28,7 @@
 	</div>
 
 	<script type="text/javascript">
-		var socket = io(location.href.slice(0,location.href.indexOf(':3333')+5));
+		var socket = io(location.href.slice(0,location.href.indexOf(':8084')+5));
 		socket.on('start data', function (data) {
 		  // console.log(data);
 		  if(data.length===0){
