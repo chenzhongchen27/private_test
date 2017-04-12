@@ -19,6 +19,7 @@ function handler(req, res) {
 			//数据进行处理
 			
 			//end
+			console.log('【新的连接】','url ',req.url,'method ',req.method,'content ',content)
 			var locationObj = {
 				time:((new Date()).toLocaleString()),
 				location:content
