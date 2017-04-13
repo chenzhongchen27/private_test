@@ -28,36 +28,96 @@
 	</div>
 
 	<script type="text/javascript">
-		var socket = io(location.href.slice(0,location.href.indexOf(':8084')+5));
-		socket.on('start data', function (data) {
-		  // console.log(data);
-		  if(data.length===0){
-		  	alert('暂无历史地理数据')
-		  }else{
-		  	generateList(data)
-		  }
-		  // socket.emit('my other event', { my: 'data' });
+		// 首先，让我们检查我们是否有权限发出通知
+		// 如果没有，我们就请求获得权限
+		if (window.Notification && Notification.permission !== "granted") {
+			Notification.requestPermission(function(status) {
+				if (Notification.permission !== status) {
+					Notification.permission = status;
+				}
+			});
+		}
+
+		function myNotify(content) {
+			// 如果用户同意就创建一个通知
+			if (window.Notification && Notification.permission === "granted") {
+				n = new Notification("位置发生改变,新的位置为：", {
+					body: content
+				});
+				n.onclick = function(e) {
+					//可直接打开通知notification相关联的tab窗口
+					window.focus();
+					e.target.close();
+				}
+			}
+
+			// 如果用户没有选择是否显示通知
+			// 注：因为在 Chrome 中我们无法确定 permission 属性是否有值，因此
+			// 检查该属性的值是否是 "default" 是不安全的。
+			else if (window.Notification && Notification.permission !== "denied") {
+				Notification.requestPermission(function(status) {
+					if (Notification.permission !== status) {
+						Notification.permission = status;
+					}
+
+					// 如果用户同意了
+					if (status === "granted") {
+						n = new Notification("位置发生改变,新的位置为：", {
+							body: content
+						});
+						n.onclick = function(e) {
+							//可直接打开通知notification相关联的tab窗口
+							window.focus();
+							e.target.close()
+						}
+					}
+
+					// 否则，我们可以让步的使用常规模态的 alert
+					else {
+						alert("位置发生改变");
+					}
+				});
+			}
+
+			// 如果用户拒绝接受通知
+			else {
+				// 我们可以让步的使用常规模态的 alert
+				alert("位置发生改变");
+			}
+		};
+
+		var socket = io(location.href.slice(0, location.href.indexOf(':8084') + 5));
+		socket.on('start data', function(data) {
+			// console.log(data);
+			if (data.length === 0) {
+				alert('暂无历史地理数据')
+			} else {
+				generateList(data)
+			}
+			// socket.emit('my other event', { my: 'data' });
 		});
-		socket.on('change location',function(data){
-			alert('位置发生改变')
+		socket.on('change location', function(data) {
+			myNotify(data.location)
 			var li = generateLi(data)
 			var ulContainer = document.getElementById('ulContainer')
-			ulContainer.insertBefore(li,ulContainer.firstChild)
+			ulContainer.insertBefore(li, ulContainer.firstChild)
 		})
-		function generateList(arr){
+
+		function generateList(arr) {
 			var fragment = document.createDocumentFragment('')
-			arr.forEach(function(obj){
+			arr.forEach(function(obj) {
 				var li = generateLi(obj)
 				fragment.appendChild(li)
 			})
 			var ulContainer = document.getElementById('ulContainer')
-			ulContainer.replaceChild(fragment,ulContainer.firstChild)
+			ulContainer.replaceChild(fragment, ulContainer.firstChild)
 		}
-		function generateLi(obj){
+
+		function generateLi(obj) {
 			var time = obj.time; //进行toLocaleString转换后的
-			var location = obj.location;//发送的具体信息
+			var location = obj.location; //发送的具体信息
 			var li = document.createElement('li')
-			li.setAttribute('class','row')
+			li.setAttribute('class', 'row')
 			var timeNode = document.createElement('time')
 			var strongNode = document.createElement('strong')
 			var timeText = document.createTextNode(time)
@@ -69,9 +129,6 @@
 			li.appendChild(middleText)
 			li.appendChild(strongNode)
 			return li;
-		}
-		function domAlert(str){
-
 		}
 		// var data = [{time:((new Date()).toLocaleString()),location:'111:222'},{time:(new Date()).toLocaleString(),location:'111:222'}]
 		// generateList(data)
