@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>上传页面</title>
+</head>
+<body>
+	<table id='tableContainer'>
+		<caption>已经上传的文件</caption>
+		<tr>
+			<th>文件名</th>
+			<th>备注</th>
+		</tr>
+	</table>
+	<form action="/" enctype="multipart/form-data" method="post">
+		<!-- <input type="text" name="title" placeholder="输入需要重命名的文件名，为空则文件名不变"> -->
+		<input type="file" name="file">
+		<input type="submit" value="上传">
+	</form>
+	<script type="text/javascript">
+		fetch('/getfiles').then(function(res){
+			if(res.ok){
+				res.json().then(function(data){
+					console.log(data)
+					data.forEach(function(filename){
+						var trEle = generate(filename)
+						var tableEle = document.getElementById('tableContainer')
+						tableEle.appendChild(trEle)
+					})
+				})
+			}else{
+				alert('res出错')
+			}
+		},function(e){
+			alert('fetch出错')
+		})
+		function generate(filename) {
+			var tr = document.createElement('tr')
+
+			var td1 = document.createElement('td')
+			var td1text = document.createTextNode(filename)
+			td1.appendChild(td1text)
+			
+			var td2 = document.createElement('td')
+			var aEle = document.createElement('a')
+			aEle.setAttribute('href','/files/'+filename)
+			var aEleText = document.createTextNode('下载')
+			aEle.appendChild(aEleText)
+			td2.appendChild(aEle)
+
+			tr.appendChild(td1)
+			tr.appendChild(td2)
+			return tr;
+		}
+	</script>
+</body>
+</html>
