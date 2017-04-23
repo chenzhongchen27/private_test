@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=2d06ec118d8a28876a774907ddc09949"></script>
+	<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+
+
 	<title>位置变换通知</title>
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<style type="text/css">
@@ -16,18 +23,60 @@
 			display: table-row;
 			line-height: 25px;
 		}
+		#mask{
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			background:rgba(0,0,0,0.1); 
+			border: 1px solid green;
+		}
+		#mask #mapContainer{
+			position: absolute;
+			top: 5%;
+			left: 5%;
+			height: 90%;
+			width: 90%;
+			background: rgba(255,255,255,1);
+		}
+		#onOff{
+			position: absolute;
+			top:9px;
+			left: 5px;
+			z-index: 99;
+		}
 	</style>
 </head>
 <body>
+	<button id="onOff">地图开/关</button>
 	<div id="container">
-		<h1 class="row">位置历史记录</h1>
+		<h1>位置历史记录</h1>
 		<br />
 		<ul  id="ulContainer"  class="row">
 			
 		</ul>
 	</div>
+	<div id="mask" style="display: none;">
+		<div id="mapContainer"></div>
+		
+	</div>
 
 	<script type="text/javascript">
+		var map = ''
+
+		//按钮关联事件
+		var onOffEle = document.getElementById('onOff')
+		onOffEle.addEventListener('click',function(){
+			var maskEle = document.getElementById('mask')
+			if(mask.style.display === 'none'){
+				mask.style.display = 'block'
+				map.setFitView();
+			}else{
+				mask.style.display = 'none'
+			}
+			
+		})
 		// 首先，让我们检查我们是否有权限发出通知
 		// 如果没有，我们就请求获得权限
 		if (window.Notification && Notification.permission !== "granted") {
@@ -37,6 +86,60 @@
 				}
 			});
 		}
+
+		//地图
+		map = new AMap.Map("mapContainer", {
+		    resizeEnable: true,
+		    zoom: 13
+		});
+		// var myMarker1 = new AMap.Marker({
+		//     map: map,
+		//     position: [116.566298, 40.014171]
+		// });
+		var path = [
+		[116.169465,39.932670],
+		[116.160260,39.924492], 
+		[116.186138,39.879817], 
+		[116.150625,39.710019],
+		[116.183198,39.709920], 
+		[116.226950,39.777616], 
+		[116.421078,39.810771],
+		[116.442621,39.799892],
+		[116.463478,39.790066], 
+		[116.588276,39.809551],
+		[116.536091,39.808859],
+		[116.573856,39.839643], 
+		[116.706380,39.916740],
+		[116.657285,39.934545],
+		[116.600293,39.937770],
+		[116.540039,39.937968],
+		[116.514805,39.982375],
+		[116.499935,40.013710],
+		[116.546520,40.030443], 
+		[116.687668,40.129961], 
+		[116.539697,40.080659],
+		[116.503390,40.058474],
+		[116.468800,40.052578]
+		];
+	    var polygon = new AMap.Polygon({
+	        map: map,
+	        path: path
+	    });
+	    // map.setFitView();
+	    // isInPolygon(polygon,myMarker)
+	    /**
+	     * 判断是否在该范围内，并进行通知
+	     * @param  {[type]}  polygon  [description]
+	     * @param  {[type]}  myMarker [description]
+	     * @return {Boolean}          [description]
+	     */
+	    function isInPolygon(polygon,myMarker){
+	    	if(polygon.contains(myMarker.getPosition())){
+	    		myNotify('在该范围内')
+	    	}else{
+				myNotify('不在范围内')	    		
+	    	}
+	    }
 
 		function myNotify(content) {
 			// 如果用户同意就创建一个通知
@@ -97,7 +200,24 @@
 			// socket.emit('my other event', { my: 'data' });
 		});
 		socket.on('change location', function(data) {
-			myNotify(data.location)
+			//取得经纬度
+			var lnglat = data.location.match(/[0-9\.]+/g);
+			var alertMessage = ''
+			//在地图上进行标记
+			var myMarker = new AMap.Marker({
+			    map: map,
+			    position: lnglat
+			    ,title:data.time
+
+			});
+			map.setFitView();
+			console.log(lnglat,map)
+			if(polygon.contains(myMarker.getPosition())){
+				alertMessage = "在该范围内"
+			}else{
+				alertMessage = "!!!不在该范围内!!!"
+			}
+			myNotify(data.location+'\r\n\r\n'+alertMessage)
 			var li = generateLi(data)
 			var ulContainer = document.getElementById('ulContainer')
 			ulContainer.insertBefore(li, ulContainer.firstChild)
@@ -106,9 +226,17 @@
 		function generateList(arr) {
 			var fragment = document.createDocumentFragment('')
 			arr.forEach(function(obj) {
+				//在地图上进行标记
+				var lnglat = obj.location.match(/[0-9\.]+/g);
+				var myMarker = new AMap.Marker({
+				    map: map,
+				    position: lnglat
+				    ,title:obj.time
+				});
 				var li = generateLi(obj)
 				fragment.appendChild(li)
 			})
+			map.setFitView();
 			var ulContainer = document.getElementById('ulContainer')
 			ulContainer.replaceChild(fragment, ulContainer.firstChild)
 		}
