@@ -56,11 +56,9 @@
     			if (response.status >= 400) {
     				throw new Error("Bad response from server");
     			}
-    			console.log(response)
     			return response.json();
     		})
     		.then(function(path) {
-    			console.table(path);
     		    //绘出已存方框
     			var polygon = new AMap.Polygon({
     				map: map,
@@ -81,7 +79,6 @@
     	map.on( 'click',  function (e) {
     	    var lng = e.lnglat.getLng();
     	    var lat = e.lnglat.getLat();
-    	    console.log(lng,lat)
     	    //存起来
     	    newPath.push([lng,lat])
     	    //在图上进行标记
@@ -101,6 +98,12 @@
     		alert('还没有选择新坐标，不能预览')
     		return;
     	}
+    	if(polygon2){
+	    	polygon2.setMap(null)
+	    	polygon2 = null;
+    		
+    	}
+
     	polygon2 = new AMap.Polygon({
     	    path: JSON.parse(JSON.stringify(newPath)),//设置多边形边界路径
     	    strokeColor: "#FF33FF", //线颜色
@@ -123,8 +126,8 @@
     }
 
     function saveSelect(){
-    	if(newPath.length==0){
-    		alert('还没有选择坐标，不能保存')
+    	if(newPath.length<=1){
+    		alert('选择的坐标数最少为3')
     		return;
     	}
     	var content = JSON.stringify(newPath)
