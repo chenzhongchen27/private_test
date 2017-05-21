@@ -46,6 +46,16 @@
 			left: 5px;
 			z-index: 99;
 		}
+		#toSetArea{
+			position: absolute;
+		    top: 8px;
+		    left: 90px;
+		    z-index: 99;
+		    color: red;
+		}
+		#toSetArea:hover{
+			text-decoration: underline;
+		}
 	</style>
 </head>
 <body>
@@ -58,6 +68,7 @@
 		</ul>
 	</div>
 	<div id="mask" style="display: none;">
+		<button id="toSetArea" onclick="location.href='./setarea.html'">重新设置开锁区域</button>
 		<div id="mapContainer"></div>
 		
 	</div>
@@ -69,11 +80,11 @@
 		var onOffEle = document.getElementById('onOff')
 		onOffEle.addEventListener('click',function(){
 			var maskEle = document.getElementById('mask')
-			if(mask.style.display === 'none'){
-				mask.style.display = 'block'
+			if(maskEle.style.display === 'none'){
+				maskEle.style.display = 'block'
 				map.setFitView();
 			}else{
-				mask.style.display = 'none'
+				maskEle.style.display = 'none'
 			}
 			
 		})
@@ -92,39 +103,41 @@
 		    resizeEnable: true,
 		    zoom: 13
 		});
+		function drawOldArea(){
+			fetch('/getArea')
+				.then(function(response) {
+					if (response.status >= 400) {
+						throw new Error("Bad response from server");
+					}
+					return response.json();
+				})
+				.then(function(path) {
+				    //绘出已存方框
+				    console.log('收到数据',path[0])
+					var polygon = new AMap.Polygon({
+						map: map,
+						path: path
+					});
+				    // polygon.setMap(map);
+				    map.setFitView();
+				});
+		}
+		drawOldArea();
 		// var myMarker1 = new AMap.Marker({
 		//     map: map,
 		//     position: [116.566298, 40.014171]
 		// });
-		var path = [
-		[116.169465,39.932670],
-		[116.160260,39.924492], 
-		[116.186138,39.879817], 
-		[116.150625,39.710019],
-		[116.183198,39.709920], 
-		[116.226950,39.777616], 
-		[116.421078,39.810771],
-		[116.442621,39.799892],
-		[116.463478,39.790066], 
-		[116.588276,39.809551],
-		[116.536091,39.808859],
-		[116.573856,39.839643], 
-		[116.706380,39.916740],
-		[116.657285,39.934545],
-		[116.600293,39.937770],
-		[116.540039,39.937968],
-		[116.514805,39.982375],
-		[116.499935,40.013710],
-		[116.546520,40.030443], 
-		[116.687668,40.129961], 
-		[116.539697,40.080659],
-		[116.503390,40.058474],
-		[116.468800,40.052578]
-		];
-	    var polygon = new AMap.Polygon({
-	        map: map,
-	        path: path
-	    });
+		// var path = [
+		// [116.280137,39.839381],
+		// [116.280933,39.838669],
+		// [116.281124,39.837674], 
+		// [116.280559,39.835866], 
+		// [116.279352,39.836387], 
+		// ];
+	 //    var polygon = new AMap.Polygon({
+	 //        map: map,
+	 //        path: path
+	 //    });
 	    // map.setFitView();
 	    // isInPolygon(polygon,myMarker)
 	    /**

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>练习页面</title>
+	<style type="text/css">
+		.logo{
+			width: 50px;
+			height: 30px;
+		}
+	</style>
+</head>
+<body>
+	<img class="logo" src="./logo.png">
+	<h1 class="z-color">练习页面</h1>
+	<p>用p包裹</p>
+	<script type="text/javascript" src="./script.js" ></script>
+	<h2>用h2包裹</h2>
+	<div>用div包裹</div>
+	<ul>
+		<li>用ul li包裹</li>
+		<li>用ul li包裹</li>
+		<li>用ul li包裹</li>
+	</ul>
+	<link rel="stylesheet" type="text/css" href="./index1.css">
+	<script type="text/javascript">
+		var mapFun ={
+			1:["*","*","*","*","*"]
+			,2:["***","  *","***","*  ","***"]
+			,3:["***","  *","***","  *","***"]
+			,4:["* *","* *","***","  *","  *"]
+			,5:["***","*  ","***","  *","***"]
+			,6:["***","*  ","***","* *","***"]
+			,7:["***","  *","  *","  *","  *"]
+			,8:["***","* *","***","* *","***"]
+			,9:["***","* *","***","  *","***"]
+			,0:["***","* *","* *","* *","***"]
+			,'+':["   "," * ","***"," * ","   "]
+			,'-':["   ","   ","***","   ","   "]
+			,'*':["   ","* *"," * ","* *","   "]
+			,"/":["   ","  *"," * ","*  ","   "]
+			,"=":["   ","***","   ","***","   "]
+			,".":["   ","   ","   "," **"," **"]
+		}
+		function assem(str,index){
+			for(var i=0;i<str.length;i++){
+				str+=mapFun[str[i]][index];
+				str+="  "
+			}
+			return str;
+		}
+		function printStr(str){
+			var arr = str.split(' ')
+			debugger;
+			var last = ''
+			var result = ["","","","",""]
+			var one = parseInt(arr[0])
+			//
+			result[1]+=assem(arr[0],1)
+			result[2]+=assem(arr[0],2)
+			result[3]+=assem(arr[0],3)
+			result[4]+=assem(arr[0],4)
+			result[5]+=assem(arr[0],5)
+
+
+			var two = parseInt(arr[2])
+
+
+
+			if(arr[1]=='+'){
+				last = one + two;
+				//
+				result[1]+=assem("+",1)
+				result[2]+=assem("+",2)
+				result[3]+=assem("+",3)
+				result[4]+=assem("+",4)
+				result[5]+=assem("+",5)
+			}
+			if(arr[1]=='-'){
+				last = one - two;
+				//
+				result[1]+=assem("-",1)
+				result[2]+=assem("-",2)
+				result[3]+=assem("-",3)
+				result[4]+=assem("-",4)
+				result[5]+=assem("-",5)
+			}
+			if(arr[1]=='*'){
+				last = one * two;
+
+				//
+				result[1]+=assem("*",1)
+				result[2]+=assem("*",2)
+				result[3]+=assem("*",3)
+				result[4]+=assem("*",4)
+				result[5]+=assem("*",5)
+			}
+			if(arr[1]=='/'){
+				last = one / two;
+
+				//
+				result[1]+=assem("/",1)
+				result[2]+=assem("/",2)
+				result[3]+=assem("/",3)
+				result[4]+=assem("/",4)
+				result[5]+=assem("/",5)
+			}
+
+			//
+			result[1]+=assem(arr[2],1)
+			result[2]+=assem(arr[2],2)
+			result[3]+=assem(arr[2],3)
+			result[4]+=assem(arr[2],4)
+			result[5]+=assem(arr[2],5)
+
+			//
+			result[1]+=assem("=",1)
+			result[2]+=assem("=",2)
+			result[3]+=assem("=",3)
+			result[4]+=assem("=",4)
+			result[5]+=assem("=",5)
+
+			//
+			result[1]+=assem(last.toString(),1)
+			result[2]+=assem(last.toString(),2)
+			result[3]+=assem(last.toString(),3)
+			result[4]+=assem(last.toString(),4)
+			result[5]+=assem(last.toString(),5)
+
+			result.forEach(function(i){
+				console.log(i)
+			})
+		}
+		printStr("2 / 5")
+	</script>
+</body>
+</html>

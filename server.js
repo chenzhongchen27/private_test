@@ -9,6 +9,14 @@ app.listen(PORT,'0.0.0.0',function(){
 	console.log(`Server start on port ${PORT}`)
 });
 var locationObjHistory = []
+var polygonPath = [
+		[116.280137,39.839381],
+		[116.280933,39.838669],
+		[116.281124,39.837674], 
+		[116.280559,39.835866], 
+		[116.279352,39.836387], 
+	];
+
 
 function handler(req, res) {
 	if(req.method==='POST'){
@@ -17,6 +25,14 @@ function handler(req, res) {
 			content += chunk;
 		})
 		req.on('end',function(){
+			//处理保存绘制多边形的数据
+			if(req.url === '/saveArea'){
+				polygonPath = JSON.parse(content)
+				res.writeHead(200)
+				res.end('success save polygonPath')
+				return;
+			}
+
 			//数据进行处理
 			
 			//end
@@ -35,7 +51,7 @@ function handler(req, res) {
 			    // var str = (num1+num2).toString() + arr[3] + (num4+num5).toString()
 			    // return arr[1]
 			})
-			console.log('处理完之后的坐标',gpslnglat)
+			// console.log('处理完之后的坐标',gpslnglat)
 
 			/**
 			 * 用高德地图的接口进行坐标转换
@@ -91,7 +107,17 @@ function handler(req, res) {
 		})
 		return;
 	}
-	fs.createReadStream('./index.html').pipe(res)
+	console.log(req.url)
+	if(req.url === '/setarea.html'){
+		fs.createReadStream('./setarea.html').pipe(res)
+	}else if(req.url === '/getArea'){
+		res.writeHead(200,{
+			"Content-Type":"application/json"
+		})
+		res.end(JSON.stringify(polygonPath))
+	}else{
+		fs.createReadStream('./index.html').pipe(res)
+	}
 }
 
 io.on('connection', function(socket) {

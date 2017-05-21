@@ -2,26 +2,9 @@ var formidable = require('formidable'),
 	http = require('http'),
 	util = require('util')
 	,fs = require('fs')
-	,path = require('path')
-;
+	,path = require('path');
 
 http.createServer(function(req, res) {
-/*
-	//打印出来接受的内容
- 	if(req.method==='POST'){
-		var content='';
-		req.on('data',function(chunk){
-			content += chunk;
-		})
-		req.on('end',function(){
-			//数据进行处理
-			console.log(content)
-			res.writeHead(200)
-			res.end('上传完成')
-		})
-		return;
-	}
-*/
 	if(req.url == '/getfiles'){
 		//返回文件已有的数据
 		fs.readdir(__dirname + '/files/', function (err, files) {
@@ -29,7 +12,7 @@ http.createServer(function(req, res) {
 		    console.error(err);
 		    return;
 		  } else {
-		    res.writeHead(200)
+		    res.writeHead(500)
 		    res.end(JSON.stringify(files))
 		  }
 		});
@@ -68,4 +51,7 @@ http.createServer(function(req, res) {
 		});
 	}
 	fs.createReadStream('./index.html').pipe(res)
-}).listen(8080);
+}).listen(8070);
+
+
+
