@@ -13,7 +13,7 @@ function sendMessage(pass, warn){
 		    'sms_type':'normal',
 		    'sms_free_sign_name':'密码箱管理中心',
 		    'sms_param':'{"pass\":\"'+ pass + '\"}',
-		    'rec_num':'17888812446',
+		    'rec_num':'13261403387',
 		    'sms_template_code':'SMS_69130041'
 		}, function(error, response) {
 		    if (!error) console.log(response);
@@ -24,7 +24,7 @@ function sendMessage(pass, warn){
 		    'sms_type':'normal',
 		    'sms_free_sign_name':'密码箱管理中心',
 		    'sms_param':'{"pass\":\"'+ pass + '\"}',
-		    'rec_num':'17888812446',
+		    'rec_num':'13261403387',
 		    'sms_template_code':'SMS_67715400'
 		}, function(error, response) {
 		    if (!error) console.log(response);
