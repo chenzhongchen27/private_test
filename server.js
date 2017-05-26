@@ -4,6 +4,7 @@ var io = require('socket.io')(app);
 var fs = require('fs');
 var url = require('url');
 var PORT = 8085;
+var sendMessage = require('./alidayu/message2.js')
 
 app.listen(PORT,'0.0.0.0',function(){
 	console.log(`Server start on port ${PORT}`)
@@ -16,7 +17,17 @@ var polygonPath = [
 		[116.280559,39.835866], 
 		[116.279352,39.836387], 
 	];
+var pass = '' //存储密码，发送一次之后清空
 
+function parseContent(content){
+	var obj = {}
+	var arr = content.split('&')
+	arr.forEach(function(str){
+		var temp = str.split('=')
+		obj[temp[0]] = temp[1]
+	})
+	return obj;
+}
 
 function handler(req, res) {
 	if(req.method==='POST'){
@@ -33,18 +44,21 @@ function handler(req, res) {
 				return;
 			}
 
-			//数据进行处理
-			
+			//对密码是否发送进行处理
+			pass = parseContent(content)['key']
+			console.log('pass=> ',pass)			
 			//end
+			
 			console.log('【新的连接】','url ',req.url,'method ',req.method,'content ',content)
 			// content = content.replace(/(\d{2})\./g,".$1")
 			//提取并转化两个坐标
 			var gpslnglat=[]
 			var trsGpslnglat='' //转换后的坐标
+			//(\d{3})(\d{2}\.\d*) 如11645.222  ([^\d]*) (\d{2})(\d{2}\.\d*) 如3984.22
 			content.replace(/(\d{3})(\d{2}\.\d*)([^\d]*)(\d{2})(\d{2}\.\d*)/,function(...arr){
 			    var num1 = parseInt(arr[1])  //116
 			    var num4 = parseInt(arr[4])  //39
-			    var num2 = parseFloat(arr[2])/60
+			    var num2 = parseFloat(arr[2])/60      //先除以60进行转换，然后将该数字通过高德的接口进行转换
 			    var num5 = parseFloat(arr[5])/60
 			    gpslnglat.push(num1+num2) //存储lng
 			    gpslnglat.push(num4+num5) //存储lat  都为数字型，在发给前端时记得转成字符串形式
@@ -98,7 +112,7 @@ function handler(req, res) {
 			       res.end('success set data')
 			       //上层响应处理 end
 			     } catch (e) {
-			       console.log(e.message);
+			       console.log(e.message,'【rawData】',rawData);
 			     }
 			   });
 			 }).on('error', (e) => {
@@ -122,7 +136,19 @@ function handler(req, res) {
 
 io.on('connection', function(socket) {
 	socket.emit('start data',locationObjHistory);
-/*	socket.on('my other event', function(data) {
+	socket.on('judge scope',function(obj){
+		console.log('judgeScope',obj)
+		if(obj.isRange&&pass){
+			sendMessage(pass)
+		}else if(obj.isRange && !pass){
+			console.log('无密码，可能的原因为已发送过，请判断是否打开了多个管理员页面')
+		}else if(!obj.isRange){
+			sendMessage(pass,true)
+		}
+	});
+	socket.on('my other event', function(data) {
+		console.error('接收到yotherevent时间')
+
 		console.log(data);
-	});*/
+	});
 });

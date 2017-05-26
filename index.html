@@ -74,7 +74,7 @@
 	</div>
 
 	<script type="text/javascript">
-		var map = ''
+		var map = '',polygon=''
 
 		//按钮关联事件
 		var onOffEle = document.getElementById('onOff')
@@ -114,7 +114,7 @@
 				.then(function(path) {
 				    //绘出已存方框
 				    console.log('收到数据',path[0])
-					var polygon = new AMap.Polygon({
+					polygon = new AMap.Polygon({
 						map: map,
 						path: path
 					});
@@ -210,7 +210,6 @@
 			} else {
 				generateList(data)
 			}
-			// socket.emit('my other event', { my: 'data' });
 		});
 		socket.on('change location', function(data) {
 			//取得经纬度
@@ -225,10 +224,13 @@
 			});
 			map.setFitView();
 			console.log(lnglat,map)
+			console.log('====，触发judge scope事件')
 			if(polygon.contains(myMarker.getPosition())){
 				alertMessage = "在该范围内"
+				socket.emit('judge scope', { isRange: true });
 			}else{
 				alertMessage = "!!!不在该范围内!!!"
+				socket.emit('judge scope', { isRange: false });
 			}
 			myNotify(data.location+'\r\n\r\n'+alertMessage)
 			var li = generateLi(data)
