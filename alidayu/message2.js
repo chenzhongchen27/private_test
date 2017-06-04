@@ -6,15 +6,16 @@ var client = new TopClient({
 });
  
 
-function sendMessage(pass, warn){
+function sendMessage(pass, warn, phone){
+	//time不传递时默认为不在该区域
 	//为true时，发送秘密
 	if(warn){
 		client.execute('alibaba.aliqin.fc.sms.num.send', {
 		    'sms_type':'normal',
 		    'sms_free_sign_name':'密码箱管理中心',
 		    'sms_param':'{"pass\":\"'+ pass + '\"}',
-		    'rec_num':'13261403387',
-		    'sms_template_code':'SMS_69130041'
+		    'rec_num':phone||'13261403387',
+		    'sms_template_code':'SMS_70165312'
 		}, function(error, response) {
 		    if (!error) console.log(response);
 		    else console.log(error);
@@ -24,7 +25,7 @@ function sendMessage(pass, warn){
 		    'sms_type':'normal',
 		    'sms_free_sign_name':'密码箱管理中心',
 		    'sms_param':'{"pass\":\"'+ pass + '\"}',
-		    'rec_num':'13261403387',
+		    'rec_num':phone||'13261403387',
 		    'sms_template_code':'SMS_67715400'
 		}, function(error, response) {
 		    if (!error) console.log(response);

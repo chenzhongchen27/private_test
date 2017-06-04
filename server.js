@@ -18,6 +18,9 @@ var polygonPath = [
 		[116.279352,39.836387], 
 	];
 var pass = '' //存储密码，发送一次之后清空
+var phone = '13261403387'
+var startTime = '17:04'
+var endTime = '19:04'
 
 function parseContent(content){
 	var obj = {}
@@ -30,6 +33,9 @@ function parseContent(content){
 }
 
 function handler(req, res) {
+	console.log(req.url)
+	console.log('新的请求','startTime ',startTime,'endTime ',endTime,'phone ',phone)
+
 	if(req.method==='POST'){
 		let content='';
 		req.on('data',function(chunk){
@@ -43,13 +49,32 @@ function handler(req, res) {
 				res.end('success save polygonPath')
 				return;
 			}
+			if(req.url === '/saveTime'){
+				var parsedTime = JSON.parse(content)
+				startTime = parsedTime.startTime
+				endTime = parsedTime.endTime
+				res.writeHead(200)
+				res.end('success save time')
+
+				return;
+			}
+			if(req.url === '/savePhone'){
+				var parsedPhone = JSON.parse(content)
+				console.log(parsedPhone)
+				phone = parsedPhone.phone
+				res.writeHead(200)
+				res.end('success save phone')
+
+				return;
+			}
+
 
 			//对密码是否发送进行处理
 			pass = parseContent(content)['key']
-			console.log('pass=> ',pass)			
+			// console.log('pass=> ',pass)			
 			//end
 			
-			console.log('【新的连接】','url ',req.url,'method ',req.method,'content ',content)
+			// console.log('【新的连接】','url ',req.url,'method ',req.method,'content ',content)
 			// content = content.replace(/(\d{2})\./g,".$1")
 			//提取并转化两个坐标
 			var gpslnglat=[]
@@ -121,7 +146,6 @@ function handler(req, res) {
 		})
 		return;
 	}
-	console.log(req.url)
 	if(req.url === '/setarea.html'){
 		fs.createReadStream('./setarea.html').pipe(res)
 	}else if(req.url === '/getArea'){
@@ -129,6 +153,27 @@ function handler(req, res) {
 			"Content-Type":"application/json"
 		})
 		res.end(JSON.stringify(polygonPath))
+	}else if(req.url === '/getTime'){
+		res.writeHead(200,{
+			"Content-Type":"application/json"
+		})
+		res.end(JSON.stringify({
+			startTime : startTime,
+			endTime : endTime
+		}))
+	}else if(req.url === '/getPhone'){
+		//手机号
+		res.writeHead(200,{
+			"Content-Type":"application/json"
+		})
+		res.end(JSON.stringify({
+			phone: phone	
+		})) //phone为字符串
+	}else if(req.url === '/resource/regular.js'){
+		fs.createReadStream('./resource/regular.js').pipe(res)
+	}else if(req.url === '/favicon.ico'){
+		res.writeHead(200)
+		res.end('no icon')
 	}else{
 		fs.createReadStream('./index.html').pipe(res)
 	}
@@ -138,12 +183,56 @@ io.on('connection', function(socket) {
 	socket.emit('start data',locationObjHistory);
 	socket.on('judge scope',function(obj){
 		console.log('judgeScope',obj)
+		//判断是否在某个时间范围
+		//提取时间
+		var lastTime = locationObjHistory[0].time;
+		var curParsedArr = lastTime.split(/(\s|:)/g); //["2017-6-4", " ", "22", ":", "17", ":", "07"]
+		var startParsedArr = startTime.split(/:/g)
+		var endParsedArr = endTime.split(/:/g)
+
+		var curHour = curParsedArr[2]
+		var curMinu = curParsedArr[4]
+
+		var startHour = startParsedArr[0]
+		var startMinu = startParsedArr[1]
+
+		var endHour = endParsedArr[0]
+		var endMinu = endParsedArr[1]
+
+		console.log('curHour ',curHour,'startHour ',startHour,'endHour ',endHour)
+		console.log('curMinu ',curMinu,'startMinu ',startMinu,'endMinu ',endMinu)
+
+		if(curHour>endHour||curHour<startHour){
+			//小时完全不符合
+			console.log('时间-小时-不符合要求')
+			sendMessage(pass,true,phone)
+			return;
+		}else if(curHour == endHour&&curMinu>endMinu){
+			//有一个等于时，比较该分钟
+			console.log("时间-分钟-不符合要求")
+			sendMessage(pass,true,phone)
+			return
+		}else if(curHour == startHour&&curMinu<startMinu){
+			//有一个等于时，比较该分钟
+			console.log("时间-分钟-不符合要求")
+			sendMessage(pass,true,phone)
+			return;
+
+		}else{
+			// sendMessage(pass,false,phone)
+
+			console.log('时间分钟 符合要求')
+			// return;
+		}
+
+		//
+		//
 		if(obj.isRange&&pass){
-			sendMessage(pass)
+			sendMessage(pass,false,phone)
 		}else if(obj.isRange && !pass){
 			console.log('无密码，可能的原因为已发送过，请判断是否打开了多个管理员页面')
 		}else if(!obj.isRange){
-			sendMessage(pass,true)
+			sendMessage(pass,true,phone)
 		}
 	});
 	socket.on('my other event', function(data) {
