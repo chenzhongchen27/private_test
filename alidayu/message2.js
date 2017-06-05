@@ -26,7 +26,7 @@ function sendMessage(pass, warn, phone){
 		    'sms_free_sign_name':'密码箱管理中心',
 		    'sms_param':'{"pass\":\"'+ pass + '\"}',
 		    'rec_num':phone||'13261403387',
-		    'sms_template_code':'SMS_67715400'
+		    'sms_template_code':'SMS_69960253'
 		}, function(error, response) {
 		    if (!error) console.log(response);
 		    else console.log(error);
